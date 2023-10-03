@@ -21,6 +21,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.get('/'):
+async def root():
+    return 'Hello world.'
+
 @app.post("/predicts")
 async def predict(
         file: UploadFile = File(...)

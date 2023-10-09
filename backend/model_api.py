@@ -37,7 +37,7 @@ async def predict(
     print(image.shape)
     graph = tf.Graph()
     with graph.as_default():
-        model = tf.keras.models.load_model('services/ml_services/models/unet_july_19.h5', compile=False)
+        model = tf.keras.models.load_model('services/ml_services/models/unet_19_s3.h5', compile=False)
         original_image = image
         h, w, _ = image.shape
         image = cv2.resize(image, (256, 256))
@@ -74,5 +74,5 @@ async def predict(
         return JSONResponse(content=response_data)
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  
     uvicorn.run(app, host='0.0.0.0', port=8100)

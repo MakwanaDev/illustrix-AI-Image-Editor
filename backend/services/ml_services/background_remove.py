@@ -2,7 +2,8 @@
 # from tensorflow.keras.models import Model
 import numpy as np
 import cv2
-
+import requests
+import json
 
 from services.file import save_to_final_folder, save_to_sub_folder
 from config.settings import file_structure

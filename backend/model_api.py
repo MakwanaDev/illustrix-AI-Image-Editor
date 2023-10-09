@@ -67,8 +67,8 @@ async def predict(
         # Convert the list to a JSON-formatted string
         img_str = json.dumps(img_list)
 
-        with open('Img.txt', 'w') as tx:
-            tx.write(img_str)
+        # with open('Img.txt', 'w') as tx:
+        #     tx.write(img_str)
 
         response_data = {"image_data": img_str}
         return JSONResponse(content=response_data)

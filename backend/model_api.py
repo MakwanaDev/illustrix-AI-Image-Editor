@@ -32,7 +32,11 @@ async def predict(
     contents = await file.read()
 
     nparr = np.frombuffer(contents, np.uint8)
-    image = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+    print(image.shape)
+    try:
+        image = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+    except Exception as e:
+        return {'error': f'Error decoding image : {str(e)}'}
 
     print(image.shape)
     graph = tf.Graph()

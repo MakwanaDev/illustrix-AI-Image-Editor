@@ -32,7 +32,7 @@ async def predict(
     contents = await file.read()
 
     nparr = np.frombuffer(contents, np.uint8)
-    print(image.shape)
+    print('Hello world..')
     try:
         image = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
     except Exception as e:

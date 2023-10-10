@@ -30,7 +30,7 @@ async def predict(
         file: UploadFile = File(...)
 ):
     contents = await file.read()
-
+    print(f"Received data: {contents[:50]}")
     nparr = np.frombuffer(contents, np.uint8)
     print('Hello world..')
     try:

@@ -7,6 +7,13 @@ class DBSettings(BaseSettings):
 
 db_settings = DBSettings()
 
+class S3_credentials(BaseSettings):
+    bucket_nm: str = "illustrix-image-data"
+    aws_access_keyid: str = 'AKIARGPTIVBM3RH6CTDV'
+    aws_secret_accesskey: str = '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'
+
+s3_credentials = S3_credentials()
+
 class JWT(BaseSettings):
     JWT_Secret: str = "Femj4ul1V2Xk3A3Amy6w7cE9gVAdn96Y"
     JWT_Expiry_Time: int = 86400
@@ -25,11 +32,11 @@ constants = Constants()
 
 class FileStructure(BaseSettings):
     SERVER_URL = "http://localhost:8000/"
-    BASE_STRUCTURE: list = ["/upload", "/final", "/background_remove", "/background", "/background_blur", "/combined_image", "/flip_vertically", "/flip_horizontally", "/black_and_white", "/saturation", "/hue", "/contrast", "/brightness", "/sharpness", "/painting", "/sketching", "/cartoonification", "/image_super_resolution"]
-    USER_DATA: str = "./static/user_data/"
+    BASE_STRUCTURE: list = ["/upload/", "/final/", "/background_remove/", "/background/", "/background_blur/", "/combined_image/", "/flip_vertically/", "/flip_horizontally/", "/black_and_white/", "/saturation/", "/hue/", "/contrast/", "/brightness/", "/sharpness/", "/painting/", "/sketching/", "/cartoonification/", "/image_super_resolution/"]
+    USER_DATA: str = "static/user_data/"
     STATIC_FOLDER: str = "./static/"
     MODEL_FOLDER: str = "./services/ml_services/models/"
-    FINAL_IMAGE_PATH: str = "/final"
+    FINAL_IMAGE_PATH: str = "/final/"
     BACKGROUND_REMOVE_PATH: str = "/background_remove/"
     USER_BACKGROUND_PATH: str = "/background/"
     USER_BLURRED_BACKGROUND_PATH: str = "/background_blur/"

@@ -15,9 +15,6 @@ def resblock(inputs, out_channel=32, name='resblock'):
         
         return x + inputs
 
-
-
-
 def unet_generator(inputs, channel=32, num_blocks=4, name='generator', reuse=False):
     with tf.compat.v1.variable_scope(name, reuse=reuse):
         

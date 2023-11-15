@@ -22,6 +22,7 @@ from services.ml_services.sketching import sketching_fun
 from services.ml_services.cartoonification import cartoonification_fun
 from services.ml_services.image_super_resolution import image_super_resolution_fun
 from services.file import upload_image
+from services.file import generate_presigned_url
 
 router = APIRouter()
 
@@ -61,7 +62,7 @@ async def background_remove(request: Request) -> JSONResponse:
         if validate_jwt_token == 100:
             user_details = get_user_data_by_jwt(jwt_token)
             file_name, system_file_path, global_url, background_url, factor, save, revert = get_file_path_from_url(body)
-            bg_remove = background_remove_fun(file_name, system_file_path)
+            bg_remove = background_remove_fun(file_name, global_url, user_details['email'])
             insert_or_update_user_image(file_name = file_name, email = user_details["email"], url = global_url)
             response = Response()
             response.message = constants.SUCCESSFULLY_PERFORMED
@@ -87,7 +88,7 @@ async def background_blur(request: Request) -> JSONResponse:
         if validate_jwt_token == 100:
             user_details = get_user_data_by_jwt(jwt_token)
             file_name, system_file_path, global_url, background_url, factor, save, revert = get_file_path_from_url(body)
-            bg_remove_and_blur = self_background_blur_fun(file_name, system_file_path)
+            bg_remove_and_blur = self_background_blur_fun(file_name, global_url, user_details['email'])
             insert_or_update_user_image(file_name = file_name, email = user_details["email"], url = global_url)
             response = Response()
             response.message = constants.SUCCESSFULLY_PERFORMED
@@ -112,8 +113,8 @@ async def background_replace(request: Request) -> JSONResponse:
         print(validate_jwt_token)
         if validate_jwt_token == 100:
             user_details = get_user_data_by_jwt(jwt_token)
-            file_name, system_file_path, global_url, background_path, factor, save, revert = get_file_path_from_url(body)
-            bg_replace = background_replace_fun(file_name, system_file_path, background_path)
+            file_name, system_file_path, global_url, background_path, factor, save, revert = get_file_path_from_url(body, user_details['email'])
+            bg_replace = background_replace_fun(file_name, global_url, background_path, user_details['email'])
             insert_or_update_user_image(file_name = file_name, email = user_details["email"], url = global_url)
             response = Response()
             response.message = constants.SUCCESSFULLY_PERFORMED
@@ -138,7 +139,7 @@ async def flip_vertically(request: Request) -> JSONResponse:
         print(validate_jwt_token)
         if validate_jwt_token == 100:
             user_details = get_user_data_by_jwt(jwt_token)
-            file_name, system_file_path, global_url, background_path, factor, save, revert = get_file_path_from_url(body)
+            file_name, system_file_path, global_url, background_path, factor, save, revert = get_file_path_from_url(body, email=user_details['email'])
             fliped_image = flip_vertically_fun(file_name = file_name, system_file_path = system_file_path)
             insert_or_update_user_image(file_name = file_name, email = user_details["email"], url = global_url)
             response = Response()
@@ -164,7 +165,7 @@ async def flip_horizontally(request: Request) -> JSONResponse:
         print(validate_jwt_token)
         if validate_jwt_token == 100:
             user_details = get_user_data_by_jwt(jwt_token)
-            file_name, system_file_path, global_url, background_path, factor, save, revert = get_file_path_from_url(body)
+            file_name, system_file_path, global_url, background_path, factor, save, revert = get_file_path_from_url(body, email=user_details['email'])
             fliped_image = flip_horizontally_fun(file_name = file_name, system_file_path = system_file_path)
             insert_or_update_user_image(file_name = file_name, email = user_details["email"], url = global_url)
             response = Response()
@@ -190,8 +191,8 @@ async def black_and_white(request: Request) -> JSONResponse:
         print(validate_jwt_token)
         if validate_jwt_token == 100:
             user_details = get_user_data_by_jwt(jwt_token)
-            file_name, system_file_path, global_url, background_path, factor, save, revert = get_file_path_from_url(body)
-            fliped_image = black_and_white_fun(file_name = file_name, system_file_path = system_file_path, save = save, revert = revert)
+            file_name, system_file_path, global_url, background_path, factor, save, revert = get_file_path_from_url(body, email=user_details['email'])
+            fliped_image = black_and_white_fun(file_name = file_name, system_file_path = system_file_path, save = save, revert = revert, email=user_details['email'])
             insert_or_update_user_image(file_name = file_name, email = user_details["email"], url = global_url)
             response = Response()
             response.message = constants.SUCCESSFULLY_PERFORMED
@@ -216,8 +217,8 @@ async def saturation(request: Request) -> JSONResponse:
         print(validate_jwt_token)
         if validate_jwt_token == 100:
             user_details = get_user_data_by_jwt(jwt_token)
-            file_name, system_file_path, global_url, background_path, factor, save, revert = get_file_path_from_url(body)
-            saturated_image = saturation_fun(file_name = file_name, system_file_path = system_file_path, factor = factor, save = save, revert = revert)
+            file_name, system_file_path, global_url, background_path, factor, save, revert = get_file_path_from_url(body, email=user_details['email'])
+            saturated_image = saturation_fun(file_name = file_name, system_file_path = system_file_path, factor = factor, save = save, revert = revert, email=user_details['email'])
             insert_or_update_user_image(file_name = file_name, email = user_details["email"], url = global_url)
             response = Response()
             response.message = constants.SUCCESSFULLY_PERFORMED
@@ -242,8 +243,8 @@ async def hue(request: Request) -> JSONResponse:
         print(validate_jwt_token)
         if validate_jwt_token == 100:
             user_details = get_user_data_by_jwt(jwt_token)
-            file_name, system_file_path, global_url, background_path, factor, save, revert = get_file_path_from_url(body)
-            hue_image = hue_fun(file_name = file_name, system_file_path = system_file_path, factor = factor, save = save, revert = revert)
+            file_name, system_file_path, global_url, background_path, factor, save, revert = get_file_path_from_url(body, email=user_details['email'])
+            hue_image = hue_fun(file_name = file_name, system_file_path = system_file_path, factor = factor, save = save, revert = revert, email=user_details['email'])
             insert_or_update_user_image(file_name = file_name, email = user_details["email"], url = global_url)
             response = Response()
             response.message = constants.SUCCESSFULLY_PERFORMED
@@ -268,8 +269,8 @@ async def contrast(request: Request) -> JSONResponse:
         print(validate_jwt_token)
         if validate_jwt_token == 100:
             user_details = get_user_data_by_jwt(jwt_token)
-            file_name, system_file_path, global_url, background_path, factor, save, revert = get_file_path_from_url(body)
-            contrasted_image = contrast_fun(file_name = file_name, system_file_path = system_file_path, factor = factor, save = save, revert = revert)
+            file_name, system_file_path, global_url, background_path, factor, save, revert = get_file_path_from_url(body, email=user_details['email'])
+            contrasted_image = contrast_fun(file_name = file_name, system_file_path = system_file_path, factor = factor, save = save, revert = revert, email=user_details['email'])
             insert_or_update_user_image(file_name = file_name, email = user_details["email"], url = global_url)
             response = Response()
             response.message = constants.SUCCESSFULLY_PERFORMED
@@ -294,8 +295,8 @@ async def brightness(request: Request) -> JSONResponse:
         print(validate_jwt_token)
         if validate_jwt_token == 100:
             user_details = get_user_data_by_jwt(jwt_token)
-            file_name, system_file_path, global_url, background_path, factor, save, revert = get_file_path_from_url(body)
-            brightness_image = brightness_fun(file_name = file_name, system_file_path = system_file_path, factor = factor, save = save, revert = revert)
+            file_name, system_file_path, global_url, background_path, factor, save, revert = get_file_path_from_url(body, email=user_details['email'])
+            brightness_image = brightness_fun(file_name = file_name, system_file_path = system_file_path, factor = factor, save = save, revert = revert, email=user_details['email'])
             insert_or_update_user_image(file_name = file_name, email = user_details["email"], url = global_url)
             response = Response()
             response.message = constants.SUCCESSFULLY_PERFORMED
@@ -320,8 +321,8 @@ async def sharpness(request: Request) -> JSONResponse:
         print(validate_jwt_token)
         if validate_jwt_token == 100:
             user_details = get_user_data_by_jwt(jwt_token)
-            file_name, system_file_path, global_url, background_path, factor, save, revert = get_file_path_from_url(body)
-            sharpness_image = sharpness_fun(file_name = file_name, system_file_path = system_file_path, factor = factor, save = save, revert = revert)
+            file_name, system_file_path, global_url, background_path, factor, save, revert = get_file_path_from_url(body, email=user_details['email'])
+            sharpness_image = sharpness_fun(file_name = file_name, system_file_path = system_file_path, factor = factor, save = save, revert = revert, email= user_details['email'])
             insert_or_update_user_image(file_name = file_name, email = user_details["email"], url = global_url)
             response = Response()
             response.message = constants.SUCCESSFULLY_PERFORMED
@@ -346,8 +347,8 @@ async def painting(request: Request) -> JSONResponse:
         print(validate_jwt_token)
         if validate_jwt_token == 100:
             user_details = get_user_data_by_jwt(jwt_token)
-            file_name, system_file_path, global_url, background_path, factor, save, revert = get_file_path_from_url(body)
-            painting_image = painting_fun(file_name = file_name, system_file_path = system_file_path, factor = factor, save = save, revert = revert)
+            file_name, system_file_path, global_url, background_path, factor, save, revert = get_file_path_from_url(body, email=user_details['email'])
+            painting_image = painting_fun(file_name = file_name, system_file_path = system_file_path, factor = factor, save = save, revert = revert, email=user_details['email'])
             insert_or_update_user_image(file_name = file_name, email = user_details["email"], url = global_url)
             response = Response()
             response.message = constants.SUCCESSFULLY_PERFORMED
@@ -372,8 +373,8 @@ async def sketching(request: Request) -> JSONResponse:
         print(validate_jwt_token)
         if validate_jwt_token == 100:
             user_details = get_user_data_by_jwt(jwt_token)
-            file_name, system_file_path, global_url, background_path, factor, save, revert = get_file_path_from_url(body)
-            sketching_image = sketching_fun(file_name = file_name, system_file_path = system_file_path, factor = factor, save = save, revert = revert)
+            file_name, system_file_path, global_url, background_path, factor, save, revert = get_file_path_from_url(body, email=user_details['email'])
+            sketching_image = sketching_fun(file_name = file_name, system_file_path = system_file_path, factor = factor, save = save, revert = revert, email=user_details['email'])
             insert_or_update_user_image(file_name = file_name, email = user_details["email"], url = global_url)
             response = Response()
             response.message = constants.SUCCESSFULLY_PERFORMED
@@ -398,8 +399,8 @@ async def cartoonification(request: Request) -> JSONResponse:
         print(validate_jwt_token)
         if validate_jwt_token == 100:
             user_details = get_user_data_by_jwt(jwt_token)
-            file_name, system_file_path, global_url, background_path, factor, save, revert = get_file_path_from_url(body)
-            cartoonification_image = cartoonification_fun(file_name = file_name, system_file_path = system_file_path, factor = factor, save = save, revert = revert)
+            file_name, system_file_path, global_url, background_path, factor, save, revert = get_file_path_from_url(body, email=user_details['email'])
+            cartoonification_image = cartoonification_fun(file_name = file_name, system_file_path = system_file_path, factor = factor, save = save, revert = revert, email = user_details['email'])
             insert_or_update_user_image(file_name = file_name, email = user_details["email"], url = global_url)
             response = Response()
             response.message = constants.SUCCESSFULLY_PERFORMED
@@ -424,8 +425,8 @@ async def image_super_resolution(request: Request) -> JSONResponse:
         print(validate_jwt_token)
         if validate_jwt_token == 100:
             user_details = get_user_data_by_jwt(jwt_token)
-            file_name, system_file_path, global_url, background_path, factor, save, revert = get_file_path_from_url(body)
-            super_resolution_image = image_super_resolution_fun(file_name = file_name, system_file_path = system_file_path)
+            file_name, system_file_path, global_url, background_path, factor, save, revert = get_file_path_from_url(body, email=user_details['email'])
+            super_resolution_image = image_super_resolution_fun(file_name = file_name, system_file_path=system_file_path, email= user_details['email'])
             insert_or_update_user_image(file_name = file_name, email = user_details["email"], url = global_url)
             response = Response()
             response.message = constants.SUCCESSFULLY_PERFORMED

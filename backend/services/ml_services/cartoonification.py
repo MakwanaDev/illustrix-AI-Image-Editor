@@ -9,7 +9,7 @@ import services.ml_services.network as network
 import services.ml_services.guided_filter as guided_filter
 
 
-from services.file import save_to_final_folder, save_to_sub_folder, create_copy_image, check_copy_file_exist, delete_copy_file, revert_operation
+from services.file import save_to_final_folder, save_to_sub_folder, create_copy_image, check_copy_file_exist, delete_copy_file, revert_operation, fetch_image_from_url, generate_presigned_url
 from config.settings import file_structure
 
 input_photo = tf1.placeholder(tf1.float32, [1, None, None, 3])
@@ -37,10 +37,11 @@ def resize_crop(image):
     image = image[:h, :w, :]
     return image
 
-def cartoonification_fun(file_name: str, system_file_path: str, factor: int, save: int, revert: int) -> str:
-    cartoonification_path = file_structure.USER_DATA + system_file_path.split("/")[3] + file_structure.CARTOONNIFICATION_PATH + system_file_path.split("/")[-1]
+def cartoonification_fun(file_name: str, system_file_path: str, factor: int, save: int, revert: int, email:str) -> str:
+    cartoonification_path = file_structure.USER_DATA + email + file_structure.CARTOONNIFICATION_PATH + system_file_path.split("/")[-1]
     operation_file_path = check_copy_file_exist(original_path = system_file_path, sub_path = cartoonification_path, file_name = file_name)
-    image = cv2.imread(operation_file_path)
+    operation_file_url = generate_presigned_url(operation_file_path)
+    image = fetch_image_from_url(operation_file_url)
     image = resize_crop(image)
     batch_image = image.astype(np.float32)/127.5 - 1
     batch_image = np.expand_dims(batch_image, axis=0)

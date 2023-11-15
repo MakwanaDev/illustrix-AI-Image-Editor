@@ -7,3 +7,4 @@ class Image(Document):
     url = StringField(required=True)
     created_at = DateTimeField(default = datetime.utcnow())
     updated_at = DateTimeField(default =  datetime.utcnow())
+

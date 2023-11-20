@@ -133,9 +133,7 @@ def create_base_structure(email: str) -> None:
             s3.put_object(Bucket=bucket_name, Key=sub_folder_path)
 
 def get_file_path_from_url(body: dict, email : str = '') -> str:
-    print('\n\n\n\n\n---------------***************----------------\n\n\n\n')
     global_url = body["image_url"]
-    print("\nGlobal Url: ---------------", global_url)
     file_name = body["image_url"].split("/")[-1]
     system_path = file_structure.USER_DATA + email + file_structure.FINAL_IMAGE_PATH + body['image_url'].split("/")[-1]
     background_image = ""
@@ -165,7 +163,6 @@ def generate_random_string() -> str:
 
 def upload_image(email: str, base_64_string: str) -> str:
     image = base64.b64decode(base_64_string, validate=True)
-    print("\n\n\n****************Uploaded Image type : ", type(image))
     upload_path = file_structure.USER_DATA + email + file_structure.UPLOAD_PATH
     file_name = generate_random_string() + ".png"
     file_path = upload_path + file_name

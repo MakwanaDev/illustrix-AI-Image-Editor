@@ -4,7 +4,8 @@ from fastapi.responses import JSONResponse
 from schemas.image import Response
 from config.settings import constants
 from services.file import get_file_path_from_url
-from services.db import connect_mongo_db, insert_or_update_user_image, get_user_images_by_email
+# from services.db import connect_mongo_db, insert_or_update_user_image, get_user_images_by_email
+from services.db import DatabaseConnector, insert_or_update_user_image, get_user_images_by_email
 from services.auth import get_jwt_token, check_jwt_token, get_user_data_by_jwt
 from services.ml_services.background_remove import background_remove_fun
 from services.ml_services.self_background_blur import self_background_blur_fun
@@ -26,7 +27,8 @@ from services.file import generate_presigned_url
 
 router = APIRouter()
 
-connect_mongo_db()
+# connect_mongo_db()
+db_connector = DatabaseConnector()
 
 @router.post("/upload")
 async def upload(request: Request) -> JSONResponse:
@@ -36,8 +38,10 @@ async def upload(request: Request) -> JSONResponse:
         validate_jwt_token = check_jwt_token(jwt_token)
         if validate_jwt_token == 100:
             user_details = get_user_data_by_jwt(jwt_token)
+            # print('HELLLLLLLLLLLLLO33333333333333')
             global_url, file_name = upload_image(email = user_details["email"], base_64_string = body["image"])
             insert_or_update_user_image(file_name = file_name, email = user_details["email"], url = global_url)
+            # print('HELLLLLLLLLLLLLO444444444444444')
             response = Response()
             response.message = constants.SUCCESSFULLY_PERFORMED
             response.url = global_url
@@ -450,7 +454,9 @@ async def get_user_images(request: Request) -> JSONResponse:
         print(validate_jwt_token)
         if validate_jwt_token == 100:
             user_details = get_user_data_by_jwt(jwt_token)
+            # print('HELLLLLLLLLLLLLO33333333333333')
             global_url = get_user_images_by_email(email = user_details["email"])
+            # print('HELLLLLLLLLLLLLO55555555555')
             response = Response()
             response.message = constants.SUCCESSFULLY_PERFORMED
             response.url = global_url

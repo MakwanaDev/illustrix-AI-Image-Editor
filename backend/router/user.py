@@ -2,7 +2,8 @@ from fastapi import APIRouter, Request, status
 from fastapi.responses import JSONResponse
 
 from models.user import User
-from services.db import connect_mongo_db, insert_one_user, search_by_email, update_user_detailsby_email
+# from services.db import connect_mongo_db, insert_one_user, search_by_email, update_user_detailsby_email
+from services.db import DatabaseConnector, insert_one_user, search_by_email, update_user_detailsby_email
 from services.auth import generate_jwt_token, get_jwt_token, check_jwt_token, get_user_data_by_jwt
 from schemas.user import Response
 from config.settings import constants
@@ -10,9 +11,10 @@ from services.file import create_base_structure
 
 
 router = APIRouter()
+# print('111111111111')
+db_connector = DatabaseConnector()
 
-connect_mongo_db()
-
+# print('111111111111')
 @router.post("/login")
 async def login(request: Request) -> JSONResponse:
     try:
@@ -20,8 +22,8 @@ async def login(request: Request) -> JSONResponse:
         email = body["email"]
         password = body["password"]
         user_details = search_by_email(email)
-        for i in user_details:
-            if i.email == email and i.password == password:
+        # for i in user_details:
+        if user_details['email'] == email and user_details['password'] == password:
                 create_base_structure(email=email)
                 jwt_token = generate_jwt_token(email=email, password=password)
                 response = Response()
@@ -43,7 +45,7 @@ async def singup(request: Request) -> JSONResponse:
     try:
         body = await request.json()
         user_model = User(first_name = body["first_name"], last_name = body["last_name"], email = body["email"], password = body["password"])
-        user_model.validate()
+        user_model.validate()   
         insert_one_user(user_model)
         response = Response()
         response.message = constants.SUCCESS_SIGNUP
@@ -64,11 +66,10 @@ async def get_user_details(request: Request) -> JSONResponse:
             user_details = get_user_data_by_jwt(jwt_token)
             user_details = search_by_email(email = user_details["email"])
             response = Response()
-            for i in user_details:
-                response.first_name = i.first_name
-                response.last_name = i.last_name
-                response.email = i.email
-                response.password = i.password
+            response.first_name = user_details["first_name"]
+            response.last_name = user_details["last_name"]
+            response.email = user_details["email"]
+            response.password = user_details['password']
             response.message = constants.SUCCESSFULLY_PERFORMED
             return JSONResponse(status_code=status.HTTP_200_OK, content=response.dict(exclude_none=True))
         elif validate_jwt_token == 101 or validate_jwt_token == 102:

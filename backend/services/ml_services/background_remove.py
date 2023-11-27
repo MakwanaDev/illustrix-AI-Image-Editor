@@ -30,7 +30,7 @@ def background_remove_fun(file_name: str, image_url: str, email: str) -> str:
                 image_buffer = io.BytesIO(image_data)
                 buffered_image = SimilarBufferedReader(image_buffer)
 
-            url = 'http://ec2-54-90-128-153.compute-1.amazonaws.com:8100/predicts'
+            url = 'http://ec2-54-89-161-98.compute-1.amazonaws.com:8100/predicts'
             name = image_url.split('/')[-1]
             files1 = {'file': (f'{name}', buffered_image, 'image/png')}
             
